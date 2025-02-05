@@ -5,9 +5,12 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use smart_road::cars::cars::Rotation;
 use smart_road::display::Display;
+use std::fs::File;
+use std::io::Read;
 use std::time::Duration;
 
 use smart_road::cars::Car;
+use smart_road::atlas::*;
 
 pub fn main() {
     let sdl_context = sdl2::init().unwrap();
@@ -32,6 +35,13 @@ pub fn main() {
     let mut car_b: Car = Car::new(Point::new(400, 400), 20, 30);
     car_b.show_collisions(true);
     car_b.show_detections(true);
+
+    let mut file = File::open("assets/cars.atlas").unwrap();
+    let mut data = Vec::new();
+    file.read_to_end(&mut data).unwrap();
+    let atlas_data = String::from_utf8(data).unwrap();
+    let atlas = Atlas::parse(&atlas_data);
+    println!("{:?}",atlas);
 
 
     'running: loop {
