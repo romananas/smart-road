@@ -11,7 +11,7 @@ fn main() -> Result<(), String> {
     let video_subsystem = sdl_context.video()?;
 
     let window = video_subsystem
-        .window("Affichage d'une partie de l'image", 1000, 1000)
+        .window("Affichage d'une partie de l'image", 1100, 1100)
         .position_centered()
         .build()
         .map_err(|e| e.to_string())?;
