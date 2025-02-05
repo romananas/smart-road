@@ -1,70 +1,66 @@
 extern crate sdl2;
 
-use sdl2::{pixels::Color, rect::Point};
 use sdl2::event::Event;
+use sdl2::image::{InitFlag, LoadTexture};
 use sdl2::keyboard::Keycode;
-use smart_road::cars::cars::Rotation;
-use smart_road::display::Display;
+use sdl2::rect::Rect;
 use std::time::Duration;
 
-use smart_road::cars::Car;
+fn main() -> Result<(), String> {
+    // Initialisation de SDL2
+    let sdl_context = sdl2::init()?;
+    let video_subsystem = sdl_context.video()?;
 
-pub fn main() {
-    let sdl_context = sdl2::init().unwrap();
-    let video_subsystem = sdl_context.video().unwrap();
-
-    let window = video_subsystem.window("rust-sdl2 demo", 800, 800)
+    // Création de la fenêtre
+    let window = video_subsystem
+        .window("Affichage d'une partie de l'image", 800, 600)
         .position_centered()
         .build()
-        .unwrap();
+        .map_err(|e| e.to_string())?;
 
-    let mut canvas = window.into_canvas().build().unwrap();
+    let mut canvas = window.into_canvas().present_vsync().build().map_err(|e| e.to_string())?;
 
-    canvas.set_draw_color(Color::RGB(0, 255, 255));
-    canvas.clear();
-    canvas.present();
-    let mut event_pump = sdl_context.event_pump().unwrap();
+    // Initialisation du module image
+    let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG)?;
 
-    let mut car_a: Car = Car::new(Point::new(400, 400), 20, 30);
-    car_a.show_collisions(true);
-    car_a.show_detections(true);
+    // Création du créateur de texture
+    let texture_creator = canvas.texture_creator();
 
-    let mut car_b: Car = Car::new(Point::new(400, 400), 20, 30);
-    car_b.show_collisions(true);
-    car_b.show_detections(true);
+    // Chargement de l'image en tant que texture
+    let texture = texture_creator.load_texture("assets/road.png")?;  // Remplace par ton image
 
+    // Définition de la zone source (x, y, largeur, hauteur)
+    let src_rect = Rect::new(0, 0, 16, 16); // Prend une partie de 200x200 à partir de (50,50)
 
+    // Définition de la zone de destination sur l'écran
+    let dest_rect = Rect::new(0, 0, 16, 16); // Affiche cette partie à (100,100)
+
+    // Boucle principale
+    let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
-        canvas.set_draw_color(Color::BLACK);
-        canvas.clear();
         for event in event_pump.poll_iter() {
             match event {
-                Event::Quit {..} |
-                Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                    break 'running
-                },
-                Event::KeyDown { keycode: Some(Keycode::R),.. } => {
-                    car_a.rotate(Rotation::Right);
-                },
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break 'running,
                 _ => {}
             }
         }
-        // Récupérer la position du curseur
-        let mouse_state = event_pump.mouse_state();
-        let x = mouse_state.x();
-        let y = mouse_state.y();
 
-        car_a.move_to(x, y);
+        // Effacer l'écran
+        canvas.clear();
 
-        
-        let _ = car_a.state_check(&car_b);
+        // Dessiner une partie de l'image (src_rect → dest_rect)
+        canvas.copy(&texture, src_rect, dest_rect)?;
 
-        let _ = car_a.display(&mut canvas);
-
-        let _ = car_b.display(&mut canvas);
-
-
+        // Mettre à jour l'affichage
         canvas.present();
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
+
+        // Petit délai pour éviter d'utiliser trop de CPU
+        std::thread::sleep(Duration::from_millis(16));
     }
+
+    Ok(())
 }
