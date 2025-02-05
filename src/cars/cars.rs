@@ -19,7 +19,9 @@ const _SLOWING_VELOCITY: u32 = BASE_VELOCITY / 2;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum IntersectionType {
     Collision,
-    Detection,
+    SawDetectionBox,
+    SawCollisionBox,
+
 }
 
 #[derive(Debug,Clone, Copy)]
@@ -28,7 +30,7 @@ pub enum Rotation {
     Left,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug,PartialEq, Eq)]
 pub enum Direction {
     North,
     East,
@@ -40,7 +42,9 @@ pub struct Car {
     pub velocity: u32,
     collision_box: Rect,
     detection_box: Rect,
+
     direction: Direction,
+
     show_col: bool,
     show_detect: bool,
 
@@ -61,38 +65,63 @@ impl Car {
         }
     }
 
-    pub fn rotate(&mut self, rotation: Rotation) {
-        self.direction = match (self.direction, rotation) {
-            (Direction::North, Rotation::Left) => Direction::West,
-            (Direction::North, Rotation::Right) => Direction::East,
-
-            (Direction::East, Rotation::Left) => Direction::North,
-            (Direction::East, Rotation::Right) => Direction::South,
-
-            (Direction::South, Rotation::Left) => Direction::East,
-            (Direction::South, Rotation::Right) => Direction::West,
-
-            (Direction::West, Rotation::Left) => Direction::South,
-            (Direction::West, Rotation::Right) => Direction::North,
-        };
-
-        // Swap width and height when rotating between horizontal & vertical
-        let (w, h) = (self.collision_box.width(), self.collision_box.height());
+    pub fn set_direction(&mut self,direction: Direction) {
         let center = self.collision_box.center();
-
-        let (new_w, new_h) = match rotation {
-            Rotation::Left | Rotation::Right => (h, w),
-        };
-
+        let (mut new_h,mut new_w) = (self.collision_box.height(),self.collision_box.width());
+        use Direction::*;
+        if self.direction == direction {
+            return;
+        }
+        match (self.direction,direction) {
+            (North,South)|(South,North)|(West,East)|(East,West) => {},
+            _ => {
+                let tmp = new_h;
+                new_h = new_w;
+                new_w = tmp;
+            },
+        }
+        self.direction = direction;
         self.collision_box = Rect::from_center(center, new_w, new_h);
         self.detection_box = match self.direction {
-            Direction::North => Rect::from_center(Point::new(center.x, center.y - (new_h as f32 * 1.25) as i32), new_w, (new_h as f64 * 1.5) as u32),
-            Direction::South => Rect::from_center(Point::new(center.x, center.y + (new_h as f32 * 1.25) as i32), new_w, (new_h as f64 * 1.5) as u32),
-
-            Direction::East => Rect::from_center(Point::new(center.x + (new_w as f32 * 1.25) as i32, center.y), (new_w as f64 * 1.5) as u32, new_h),
-            Direction::West => Rect::from_center(Point::new(center.x - (new_w as f32 * 1.25) as i32, center.y), (new_w as f64 * 1.5) as u32, new_h),
-        };
+             Direction::North => Rect::from_center(Point::new(center.x, center.y - (new_h as f32 * 1.25) as i32), new_w, (new_h as f64 * 1.5) as u32),
+             Direction::South => Rect::from_center(Point::new(center.x, center.y + (new_h as f32 * 1.25) as i32), new_w, (new_h as f64 * 1.5) as u32),
+             Direction::East => Rect::from_center(Point::new(center.x + (new_w as f32 * 1.25) as i32, center.y), (new_w as f64 * 1.5) as u32, new_h),
+             Direction::West => Rect::from_center(Point::new(center.x - (new_w as f32 * 1.25) as i32, center.y), (new_w as f64 * 1.5) as u32, new_h),
+         };
     }
+
+    // pub fn rotate(&mut self, rotation: Rotation) {
+    //     self.direction = match (self.direction, rotation) {
+    //         (Direction::North, Rotation::Left) => Direction::West,
+    //         (Direction::North, Rotation::Right) => Direction::East,
+
+    //         (Direction::East, Rotation::Left) => Direction::North,
+    //         (Direction::East, Rotation::Right) => Direction::South,
+
+    //         (Direction::South, Rotation::Left) => Direction::East,
+    //         (Direction::South, Rotation::Right) => Direction::West,
+
+    //         (Direction::West, Rotation::Left) => Direction::South,
+    //         (Direction::West, Rotation::Right) => Direction::North,
+    //     };
+
+    //     // Swap width and height when rotating between horizontal & vertical
+    //     let (w, h) = (self.collision_box.width(), self.collision_box.height());
+    //     let center = self.collision_box.center();
+
+    //     let (new_w, new_h) = match rotation {
+    //         Rotation::Left | Rotation::Right => (h, w),
+    //     };
+
+    //     self.collision_box = Rect::from_center(center, new_w, new_h);
+    //     self.detection_box = match self.direction {
+    //         Direction::North => Rect::from_center(Point::new(center.x, center.y - (new_h as f32 * 1.25) as i32), new_w, (new_h as f64 * 1.5) as u32),
+    //         Direction::South => Rect::from_center(Point::new(center.x, center.y + (new_h as f32 * 1.25) as i32), new_w, (new_h as f64 * 1.5) as u32),
+
+    //         Direction::East => Rect::from_center(Point::new(center.x + (new_w as f32 * 1.25) as i32, center.y), (new_w as f64 * 1.5) as u32, new_h),
+    //         Direction::West => Rect::from_center(Point::new(center.x - (new_w as f32 * 1.25) as i32, center.y), (new_w as f64 * 1.5) as u32, new_h),
+    //     };
+    // }
 
     pub fn show_collisions(&mut self, b: bool) {
         self.show_col = b;
@@ -124,8 +153,8 @@ impl Car {
             return Some(IntersectionType::Collision);
         }
         if self.detection_box.has_intersection(other.detection_box) || self.detection_box.has_intersection(other.collision_box) {
-            self.is_detecting = Some(IntersectionType::Detection);
-            return Some(IntersectionType::Detection);
+            self.is_detecting = Some(IntersectionType::SawDetectionBox);
+            return Some(IntersectionType::SawDetectionBox);
         }
         self.is_detecting = None;
         None
@@ -136,9 +165,10 @@ impl Car {
     
         if previous_state != new_state {
             match new_state {
-                Some(IntersectionType::Collision) => println!("Collision détectée"),
-                Some(IntersectionType::Detection) => println!("Voiture à proximité"),
-                None => println!("Plus de véhicule détecté"),
+                Some(IntersectionType::Collision) => println!("Collision detected"),
+                Some(IntersectionType::SawDetectionBox) => println!("A car is comming"),
+                Some(IntersectionType::SawCollisionBox) => println!("A car is in front"),
+                None => println!("No car detected"),
             }
         }
     }
@@ -154,7 +184,8 @@ impl display::Display for Car {
             match &self.is_detecting {
                 Some(t) => {
                     match t {
-                        IntersectionType::Detection => canvas.set_draw_color(Color::YELLOW),
+                        IntersectionType::SawDetectionBox => canvas.set_draw_color(Color::YELLOW),
+                        IntersectionType::SawCollisionBox => canvas.set_draw_color(Color::RGB(255, 92, 0)), // NEON ORANGE
                         IntersectionType::Collision => canvas.set_draw_color(Color::RED),
                     }
                 }

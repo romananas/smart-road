@@ -4,7 +4,11 @@ mod map;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
+use sdl2::rect::Point;
+use smart_road::display::Display;
 use std::time::Duration;
+
+use smart_road::cars::*;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -19,6 +23,9 @@ fn main() -> Result<(), String> {
     let mut canvas = window.into_canvas().present_vsync().build().map_err(|e| e.to_string())?;
 
     let mut event_pump = sdl_context.event_pump()?;
+    let mut car = Car::new(Point::new(550, 500), 20, 40);
+    car.show_collisions(true);
+    car.show_detections(true);
     
     'running: loop {
         for event in event_pump.poll_iter() {
@@ -28,6 +35,10 @@ fn main() -> Result<(), String> {
                     keycode: Some(Keycode::Escape),
                     ..
                 } => break 'running,
+                Event::KeyDown {keycode : Some(Keycode::W),..} => car.set_direction(cars::Direction::North),
+                Event::KeyDown {keycode : Some(Keycode::S),..} => car.set_direction(cars::Direction::South),
+                Event::KeyDown {keycode : Some(Keycode::D),..} => car.set_direction(cars::Direction::East),
+                Event::KeyDown {keycode : Some(Keycode::A),..} => car.set_direction(cars::Direction::West),
                 _ => {}
             }
         }
@@ -35,6 +46,8 @@ fn main() -> Result<(), String> {
         canvas.clear();
 
         map::load_map(&mut canvas)?;
+
+        let _ = car.display(&mut canvas);
 
         canvas.present();
 
