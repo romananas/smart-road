@@ -42,6 +42,20 @@ impl<'a> Atlas<'a> {
                         Some((_, value)) => value.as_str().trim(),
                         None => return Err("field \"format\" not found".to_string()),
                     },
+            filter: match find_field(lines.clone(), "filter:") {
+                        Some((_,v)) => {
+                            let filters: Vec<_> = v.split(",").map(|s| parse_filter(s)).collect();
+                            if filters.len() == 2 {
+                                match (filters[0], filters[1]) {
+                                    (Some(f1), Some(f2)) => (f1, f2),
+                                    _ => return Err("Invalid filter values".to_string()),
+                                }
+                            } else {
+                                return Err("Invalid filter format".to_string());
+                            }
+                        },
+                        None => return Err("field \"filter\" not found".to_string()),
+                    },
 
         };
 
@@ -59,6 +73,14 @@ fn find_field(lines: Vec<&str>,field: &str) -> Option<(u32,String)> {
         }
     };
     None
+}
+
+fn parse_filter(s: &str) -> Option<Filter>{
+    match s.trim() {
+        "Nearest" => Some(Filter::Nearest),
+        "Linear" => Some(Filter::Linear),
+        _ => None
+    }
 }
 
 impl <'a> Deref for Atlas<'a> {
