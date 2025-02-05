@@ -23,7 +23,7 @@ fn main() -> Result<(), String> {
     let mut canvas = window.into_canvas().present_vsync().build().map_err(|e| e.to_string())?;
 
     let mut event_pump = sdl_context.event_pump()?;
-    let mut car = Car::new(Point::new(550, 500), 20, 40);
+    let mut car = Car::new(Point::new(550, 550), 20, 40);
     car.show_collisions(true);
     car.show_detections(true);
     
@@ -47,11 +47,14 @@ fn main() -> Result<(), String> {
 
         map::load_map(&mut canvas)?;
 
+        car.go_to(Point::new(1100, 550));
+
         let _ = car.display(&mut canvas);
 
         canvas.present();
 
-        std::thread::sleep(Duration::from_millis(16));
+        // std::thread::sleep(Duration::from_millis(16));
+        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
 
     Ok(())

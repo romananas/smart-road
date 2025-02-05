@@ -7,7 +7,7 @@ use crate::display;
 
 #[allow(dead_code)]
 
-const BASE_VELOCITY: u32 = 100;
+const BASE_VELOCITY: u32 = 5;
 const _SLOWING_VELOCITY: u32 = BASE_VELOCITY / 2;
 
 /// A return type to detect a collision,
@@ -24,12 +24,6 @@ pub enum IntersectionType {
 
 }
 
-#[derive(Debug,Clone, Copy)]
-pub enum Rotation {
-    Right,
-    Left,
-}
-
 #[derive(Clone, Copy, Debug,PartialEq, Eq)]
 pub enum Direction {
     North,
@@ -39,7 +33,7 @@ pub enum Direction {
 }
 
 pub struct Car {
-    pub velocity: u32,
+    pub velocity: u32, // pixels/refresh
     collision_box: Rect,
     detection_box: Rect,
 
@@ -90,39 +84,6 @@ impl Car {
          };
     }
 
-    // pub fn rotate(&mut self, rotation: Rotation) {
-    //     self.direction = match (self.direction, rotation) {
-    //         (Direction::North, Rotation::Left) => Direction::West,
-    //         (Direction::North, Rotation::Right) => Direction::East,
-
-    //         (Direction::East, Rotation::Left) => Direction::North,
-    //         (Direction::East, Rotation::Right) => Direction::South,
-
-    //         (Direction::South, Rotation::Left) => Direction::East,
-    //         (Direction::South, Rotation::Right) => Direction::West,
-
-    //         (Direction::West, Rotation::Left) => Direction::South,
-    //         (Direction::West, Rotation::Right) => Direction::North,
-    //     };
-
-    //     // Swap width and height when rotating between horizontal & vertical
-    //     let (w, h) = (self.collision_box.width(), self.collision_box.height());
-    //     let center = self.collision_box.center();
-
-    //     let (new_w, new_h) = match rotation {
-    //         Rotation::Left | Rotation::Right => (h, w),
-    //     };
-
-    //     self.collision_box = Rect::from_center(center, new_w, new_h);
-    //     self.detection_box = match self.direction {
-    //         Direction::North => Rect::from_center(Point::new(center.x, center.y - (new_h as f32 * 1.25) as i32), new_w, (new_h as f64 * 1.5) as u32),
-    //         Direction::South => Rect::from_center(Point::new(center.x, center.y + (new_h as f32 * 1.25) as i32), new_w, (new_h as f64 * 1.5) as u32),
-
-    //         Direction::East => Rect::from_center(Point::new(center.x + (new_w as f32 * 1.25) as i32, center.y), (new_w as f64 * 1.5) as u32, new_h),
-    //         Direction::West => Rect::from_center(Point::new(center.x - (new_w as f32 * 1.25) as i32, center.y), (new_w as f64 * 1.5) as u32, new_h),
-    //     };
-    // }
-
     pub fn show_collisions(&mut self, b: bool) {
         self.show_col = b;
     }
@@ -131,6 +92,39 @@ impl Car {
         self.show_detect = b;
     }
 
+    pub fn go_to(&mut self,target: Point) -> bool {
+        let mut center = self.collision_box.center();
+        let direction = match get_direction(self.collision_box.center(), target) {
+            Some(direction) => direction,
+            None => return true,
+        };
+        self.set_direction(direction);
+
+        let pts_dist = (((target.x - center.x).pow(2) + (target.y - center.y).pow(2)) as f64).sqrt();
+        let distance = self.velocity as f64;
+
+        if pts_dist <= distance {
+            center.x = target.x;
+            center.y = target.y;
+            return true;
+        }
+         // Calcul du vecteur direction (flottants pour la précision)
+         let dx = (target.x - center.x) as f64;
+         let dy = (target.y - center.y) as f64;
+ 
+         // Calcul de la norme du vecteur
+         let magnitude = (dx.powi(2) + dy.powi(2)).sqrt();
+ 
+         // Normalisation du vecteur direction
+         let unit_x = dx / magnitude;
+         let unit_y = dy / magnitude;
+
+        center.x = (center.x as f64 + unit_x * distance).round() as i32;
+        center.y = (center.y as f64 + unit_y * distance).round() as i32;
+
+        self.move_to(center.x, center.y);
+        false
+    }
 
     pub fn move_to(&mut self,x: i32,y: i32) {
         self.collision_box = Rect::from_center(Point::new(x, y), self.collision_box.width(), self.collision_box.height());
@@ -175,6 +169,28 @@ impl Car {
     
 }
 
+fn get_direction(p1: Point, p2: Point) -> Option<Direction> {
+    let dx = (p2.x - p1.x).abs(); // Distance horizontale
+    let dy = (p2.y - p1.y).abs(); // Distance verticale
+
+    if dx == 0 && dy == 0 {
+        return None;
+    }
+
+    if dy > dx {
+        if p2.y < p1.y {
+            Some(Direction::North)
+        } else {
+            Some(Direction::South)
+        }
+    } else {
+        if p2.x > p1.x {
+            Some(Direction::East)
+        } else {
+            Some(Direction::West)
+        }
+    }
+}
 
 
 impl display::Display for Car {
