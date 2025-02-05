@@ -15,6 +15,8 @@ const _SLOWING_VELOCITY: u32 = BASE_VELOCITY / 2;
 /// Collision : the car is detecting another car in front of it
 /// 
 /// Detection : the car is detecting another car that will cross it
+
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum IntersectionType {
     Collision,
     Detection,
@@ -116,18 +118,34 @@ impl Car {
     /// and return Some(IntersectionType) if it sees a car
     /// or None if it sees nothing
     pub fn has_intersection(&mut self, other: &Self) -> Option<IntersectionType> {
-        if self.detection_box.has_intersection(other.collision_box) {
+
+        if self.collision_box.has_intersection(other.collision_box) {
             self.is_detecting = Some(IntersectionType::Collision);
             return Some(IntersectionType::Collision);
         }
-        if self.detection_box.has_intersection(other.detection_box) {
+        if self.detection_box.has_intersection(other.detection_box) || self.detection_box.has_intersection(other.collision_box) {
             self.is_detecting = Some(IntersectionType::Detection);
             return Some(IntersectionType::Detection);
         }
         self.is_detecting = None;
         None
     }
+    pub fn state_check(&mut self, other: &Self) {
+        let previous_state = self.is_detecting; 
+        let new_state = self.has_intersection(other);
+    
+        if previous_state != new_state {
+            match new_state {
+                Some(IntersectionType::Collision) => println!("Collision détectée"),
+                Some(IntersectionType::Detection) => println!("Voiture à proximité"),
+                None => println!("Plus de véhicule détecté"),
+            }
+        }
+    }
+    
 }
+
+
 
 impl display::Display for Car {
     type Error = Result<(), String>;
@@ -157,3 +175,4 @@ impl display::Display for Car {
         Err(String::from("Cannot yet display sprite, not implemented yet"))
     }
 }
+

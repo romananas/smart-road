@@ -57,7 +57,7 @@ pub fn main() {
         car_a.move_to(x, y);
 
         
-        let _ = car_a.has_intersection(&car_b);
+        let _ = car_a.state_check(&car_b);
 
         let _ = car_a.display(&mut canvas);
 
