@@ -7,7 +7,7 @@ use crate::display;
 
 #[allow(dead_code)]
 
-const BASE_VELOCITY: u32 = 5;
+const BASE_VELOCITY: u32 = 2;
 const _SLOWING_VELOCITY: u32 = BASE_VELOCITY / 2;
 
 /// A return type to detect a collision,

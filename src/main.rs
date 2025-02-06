@@ -35,10 +35,6 @@ fn main() -> Result<(), String> {
                     keycode: Some(Keycode::Escape),
                     ..
                 } => break 'running,
-                Event::KeyDown {keycode : Some(Keycode::W),..} => car.set_direction(cars::Direction::North),
-                Event::KeyDown {keycode : Some(Keycode::S),..} => car.set_direction(cars::Direction::South),
-                Event::KeyDown {keycode : Some(Keycode::D),..} => car.set_direction(cars::Direction::East),
-                Event::KeyDown {keycode : Some(Keycode::A),..} => car.set_direction(cars::Direction::West),
                 _ => {}
             }
         }
@@ -54,7 +50,7 @@ fn main() -> Result<(), String> {
         canvas.present();
 
         // std::thread::sleep(Duration::from_millis(16));
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
+        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 160));
     }
 
     Ok(())
