@@ -3,8 +3,6 @@ extern crate sdl2;
 mod assets;
 mod events;
 
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
 use sdl2::rect::Point;
 use smart_road::display::Display;
 use std::time::Duration;
