@@ -1,3 +1,3 @@
 pub mod display;
 pub mod cars;
-pub mod map;
+pub mod assets;
