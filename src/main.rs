@@ -1,6 +1,7 @@
 extern crate sdl2;
 
-mod map;
+mod assets;
+mod events;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -28,20 +29,14 @@ fn main() -> Result<(), String> {
     car.show_detections(true);
     
     'running: loop {
-        for event in event_pump.poll_iter() {
-            match event {
-                Event::Quit { .. }
-                | Event::KeyDown {
-                    keycode: Some(Keycode::Escape),
-                    ..
-                } => break 'running,
-                _ => {}
-            }
+        match events::handle(&mut event_pump) {
+            events::Type::Quit => break 'running,
+            _ => {},
         }
 
         canvas.clear();
 
-        map::load_map(&mut canvas)?;
+        assets::load_map(&mut canvas)?;
 
         //car.go_to(Point::new(1100, 550));
 
