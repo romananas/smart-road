@@ -1,11 +1,13 @@
-use sdl2::{rect::Point, EventPump};
+use sdl2::EventPump;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 
+use crate::cars;
+
 pub enum Type {
-    SpawnCar(Vec<Point>),
-    Quit,
-    None,
+    SpawnCar((cars::Direction,cars::Direction)), // direction : from,to
+    Quit, // to quit the program
+    None, // nothing happen
 }
 
 pub fn handle(ep: &mut EventPump) -> Type {
