@@ -2,6 +2,8 @@ extern crate sdl2;
 
 mod assets;
 mod events;
+mod spwn;
+
 
 use sdl2::rect::Point;
 use smart_road::display::Display;
@@ -36,7 +38,7 @@ fn main() -> Result<(), String> {
 
         assets::load_map(&mut canvas)?;
 
-        //car.go_to(Point::new(1100, 550));
+        // car.go_to(Point::new(1100, 550));
 
         let _ = car.display(&mut canvas);
 
