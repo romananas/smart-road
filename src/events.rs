@@ -10,6 +10,7 @@ pub enum Type {
     None, // nothing happen
 }
 
+
 pub fn handle(ep: &mut EventPump) -> Type {
     for event in ep.poll_iter() {
         match event {

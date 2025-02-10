@@ -53,6 +53,13 @@ Exemple :
  cargo run -- --roads 5 --vehicles 20 --priority emergency
  ```
 
+### TODO
+
+- [ ] ajouter les textures des voitures
+- [ ] optimizer la gestion des textures
+- [ ] faire la logique de déplacement
+- [ ] remplire les points dans spwn.rs
+
 ### Contribuer
 
 Les contributions sont les bienvenues ! Merci de suivre ces étapes pour proposer des modifications :
