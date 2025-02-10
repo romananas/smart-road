@@ -126,6 +126,16 @@ impl Car {
         false
     }
 
+    pub fn follow(&mut self,road: &mut Vec<Point>) -> bool {
+        if road.len() == 0 {
+            return true
+        }
+        if self.go_to(road[0]) {
+            road.remove(0);
+        }
+        false
+    }
+
     pub fn move_to(&mut self,x: i32,y: i32) {
         self.collision_box = Rect::from_center(Point::new(x, y), self.collision_box.width(), self.collision_box.height());
         self.detection_box = match self.direction {
