@@ -42,7 +42,7 @@ fn main() -> Result<(), String> {
 
         canvas.copy(&background, None, None)?;
 
-        // car.go_to(Point::new(1100, 550));
+        car.go_to(Point::new(1100, 550));
 
         let _ = car.display(&mut canvas);
 
