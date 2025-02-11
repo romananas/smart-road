@@ -1,11 +1,12 @@
 extern crate sdl2;
 
-mod assets;
+// mod map;
 mod events;
 mod spwn;
 
 
 use sdl2::rect::Point;
+use sdl2::image::LoadTexture;
 use smart_road::display::Display;
 use std::time::Duration;
 
@@ -27,6 +28,9 @@ fn main() -> Result<(), String> {
     let mut car = Car::new(Point::new(550, 550), 20, 40);
     car.show_collisions(true);
     car.show_detections(true);
+
+    let texture_creator = canvas.texture_creator();
+    let background = texture_creator.load_texture("assets/road.png")?;
     
     'running: loop {
         match events::handle(&mut event_pump) {
@@ -36,7 +40,7 @@ fn main() -> Result<(), String> {
 
         canvas.clear();
 
-        assets::load_map(&mut canvas)?;
+        canvas.copy(&background, None, None)?;
 
         // car.go_to(Point::new(1100, 550));
 
