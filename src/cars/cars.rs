@@ -251,10 +251,10 @@ impl<'a> display::Display for Car<'a> {
 
 
 
-pub const RED: Color = Color::RGB(255, 0, 0);
-pub const BLUE: Color = Color::RGB(0, 0, 255);
-pub const GREEN: Color = Color::RGB(0, 255, 0);
-pub const YELLOW: Color = Color::RGB(255, 255, 0);
+pub const RED: Color = Color::RED;
+pub const BLUE: Color = Color::BLUE;
+pub const GREEN: Color = Color::GREEN;
+pub const YELLOW: Color = Color::YELLOW;
 
 pub fn road_point(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, x: i32, y: i32, color: Color) {
     canvas.set_draw_color(color);
