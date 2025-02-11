@@ -2,12 +2,15 @@ use sdl2::rect::{Rect, Point};
 use sdl2::render::Canvas;
 use sdl2::pixels::Color;
 use sdl2::video::Window;
+use sdl2::render::Texture;
+use sdl2::image::LoadTexture;
+
 
 use crate::display;
 
 #[allow(dead_code)]
 
-const BASE_VELOCITY: u32 = 5;
+const BASE_VELOCITY: u32 = 3;
 const _SLOWING_VELOCITY: u32 = BASE_VELOCITY / 2;
 
 /// A return type to detect a collision,
@@ -31,31 +34,34 @@ pub enum Direction {
     South,
     West,
 }
-
-pub struct Car {
-    pub velocity: u32, // pixels/refresh
+pub struct Car<'a> {
+    pub velocity: u32,
     collision_box: Rect,
     detection_box: Rect,
-
     direction: Direction,
-
     show_col: bool,
     show_detect: bool,
-
-    is_detecting : Option<IntersectionType>,
+    is_detecting: Option<IntersectionType>,
+    texture: Option<Texture<'a>>,
 }
 
-impl Car {
-    pub fn new(center: Point, w: u32, l: u32) -> Self {
+impl<'a> Car<'a> {
+
+    pub fn new(center: Point, texture_creator: &'a sdl2::render::TextureCreator<sdl2::video::WindowContext>) -> Self {
+        let texture = texture_creator.load_texture("assets/car.png").ok(); // Image directement chargée ici
+        let texture_query = texture.as_ref().map(|t| t.query());
+        let texture_width = texture_query.map(|q| q.width).unwrap_or(0);
+        let texture_height = texture_query.map(|q| q.height).unwrap_or(0);
+
         Self {
-            collision_box: Rect::from_center(center, w, l),
-            detection_box: Rect::from_center(Point::new(center.x, center.y - (l as f32 * 1.25) as i32), w, (l as f64 * 1.5) as u32),
+            collision_box: Rect::from_center(center, texture_width, texture_height),
+            detection_box: Rect::from_center(Point::new(center.x, center.y - (texture_height as f32 * 1.25) as i32), texture_width, (texture_height as f64 * 1.5) as u32),
             velocity: BASE_VELOCITY,
             direction: Direction::North,
             show_col: false,
             show_detect: false,
-
             is_detecting: None,
+            texture,
         }
     }
 
@@ -126,17 +132,16 @@ impl Car {
         false
     }
 
-    pub fn move_to(&mut self,x: i32,y: i32) {
+    pub fn move_to(&mut self, x: i32, y: i32) {
         self.collision_box = Rect::from_center(Point::new(x, y), self.collision_box.width(), self.collision_box.height());
         self.detection_box = match self.direction {
             Direction::North => Rect::from_center(Point::new(x, y - (self.collision_box.height() as f32 * 1.25) as i32), self.collision_box.width(), (self.collision_box.height() as f64 * 1.5) as u32),
             Direction::South => Rect::from_center(Point::new(x, y + (self.collision_box.height() as f32 * 1.25) as i32), self.collision_box.width(), (self.collision_box.height() as f64 * 1.5) as u32),
-
             Direction::East => Rect::from_center(Point::new(x + (self.collision_box.width() as f32 * 1.25) as i32, y), (self.collision_box.width() as f64 * 1.5) as u32, self.collision_box.height()),
             Direction::West => Rect::from_center(Point::new(x - (self.collision_box.width() as f32 * 1.25) as i32, y), (self.collision_box.width() as f64 * 1.5) as u32, self.collision_box.height()),
         };
     }
-
+    
     /// Detect if the car will intersect with another car
     /// and return Some(IntersectionType) if it sees a car
     /// or None if it sees nothing
@@ -193,15 +198,17 @@ fn get_direction(p1: Point, p2: Point) -> Option<Direction> {
 }
 
 
-impl display::Display for Car {
+impl<'a> display::Display for Car<'a> {
     type Error = Result<(), String>;
+
     fn display(&self, canvas: &mut Canvas<Window>) -> Self::Error {
+        // Afficher la box de collision et la détection
         if self.show_detect {
             match &self.is_detecting {
                 Some(t) => {
                     match t {
                         IntersectionType::SawDetectionBox => canvas.set_draw_color(Color::YELLOW),
-                        IntersectionType::SawCollisionBox => canvas.set_draw_color(Color::RGB(255, 92, 0)), // NEON ORANGE
+                        IntersectionType::SawCollisionBox => canvas.set_draw_color(Color::RGB(255, 92, 0)),
                         IntersectionType::Collision => canvas.set_draw_color(Color::RED),
                     }
                 }
@@ -219,7 +226,37 @@ impl display::Display for Car {
                 Err(e) => return Err(e),
             }
         }
-        Err(String::from("Cannot yet display sprite, not implemented yet"))
+
+        // Affichage de la texture centrée sur la boxe de collision
+        if let Some(texture) = &self.texture {
+            // Récupérer les dimensions de la texture
+            let texture_query = texture.query();
+            let texture_width = texture_query.width;
+            let texture_height = texture_query.height;
+
+            // Calculer la position de la texture pour qu'elle soit centrée sur la boxe de collision
+            let x = self.collision_box.center().x - (texture_width / 2) as i32;
+            let y = self.collision_box.center().y - (texture_height / 2) as i32;
+
+            let rotation_angle = 90.0;
+
+            // Afficher la texture centrée sur la boîte de collision
+            let dest_rect = Rect::new(x, y, texture_width, texture_height);
+            canvas.copy_ex(texture, None, dest_rect, rotation_angle, None, false, false)?;        
+        }
+
+        Ok(())
     }
 }
 
+
+
+pub const RED: Color = Color::RGB(255, 0, 0);
+pub const BLUE: Color = Color::RGB(0, 0, 255);
+pub const GREEN: Color = Color::RGB(0, 255, 0);
+pub const YELLOW: Color = Color::RGB(255, 255, 0);
+
+pub fn road_point(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, x: i32, y: i32, color: Color) {
+    canvas.set_draw_color(color);
+    canvas.fill_rect(Rect::new(x, y, 5, 5)).unwrap();
+}
