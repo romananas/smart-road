@@ -3,14 +3,12 @@ extern crate sdl2;
 // mod map;
 mod events;
 mod spwn;
+// mod debug;
 
-
-use sdl2::rect::Point;
-use sdl2::image::LoadTexture;
-use smart_road::display::Display;
+use sdl2::{image::LoadTexture, rect::Point};
 use std::time::Duration;
 
-use smart_road::cars::*;
+use smart_road::{cars::*, display::Display};
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -25,13 +23,11 @@ fn main() -> Result<(), String> {
     let mut canvas = window.into_canvas().present_vsync().build().map_err(|e| e.to_string())?;
 
     let mut event_pump = sdl_context.event_pump()?;
-    let mut car = Car::new(Point::new(550, 550), 20, 40);
-    car.show_collisions(true);
-    car.show_detections(true);
 
     let texture_creator = canvas.texture_creator();
     let background = texture_creator.load_texture("assets/road.png")?;
 
+    let mut cars: Vec<(Car,Vec<Point>)> = Vec::new();
     
     'running: loop {
         match events::handle(&mut event_pump) {
@@ -43,9 +39,9 @@ fn main() -> Result<(), String> {
         canvas.clear();
 
         canvas.copy(&background, None, None)?;
-        // car.go_to(Point::new(1100, 550));
 
-        let _ = car.display(&mut canvas);
+        cars.retain_mut(|(car, path)| !car.follow(path));
+        cars.iter().for_each(|(c,_)| {let _ = c.display(&mut canvas);});
 
         canvas.present();
 
