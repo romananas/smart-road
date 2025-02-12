@@ -10,6 +10,8 @@ use crate::display;
 const BASE_VELOCITY: u32 = 2;
 const _SLOWING_VELOCITY: u32 = BASE_VELOCITY / 2;
 
+pub static DEBUG: bool = true;
+
 /// A return type to detect a collision,
 /// 
 /// Collision : the car is detecting another car in front of it
@@ -52,8 +54,8 @@ impl Car {
             detection_box: Rect::from_center(Point::new(center.x, center.y - (l as f32 * 1.25) as i32), w, (l as f64 * 1.5) as u32),
             velocity: BASE_VELOCITY,
             direction: Direction::North,
-            show_col: false,
-            show_detect: false,
+            show_col: DEBUG,
+            show_detect: DEBUG,
 
             is_detecting: None,
         }
