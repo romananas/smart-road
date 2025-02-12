@@ -34,6 +34,27 @@ pub enum Direction {
     West,
 }
 
+
+#[allow(dead_code)]
+impl Direction {
+    fn random() -> Self {
+        match rand::random_range(0..=3) {
+            0 => Self::North,
+            1 => Self::South,
+            2 => Self::East,
+            _ => Self::West
+        }
+    }
+
+    fn random_without(other: Self) -> Self {
+        let generated =  Self::random();
+        if generated == other {
+            return Self::random_without(other);
+        }
+        generated
+    }
+}
+
 pub struct Car {
     pub velocity: u32, // pixels/refresh
     collision_box: Rect,
