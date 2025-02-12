@@ -37,7 +37,7 @@ pub enum Direction {
 
 #[allow(dead_code)]
 impl Direction {
-    fn random() -> Self {
+    pub fn random() -> Self {
         match rand::random_range(0..=3) {
             0 => Self::North,
             1 => Self::South,
@@ -46,7 +46,7 @@ impl Direction {
         }
     }
 
-    fn random_without(other: Self) -> Self {
+    pub fn random_without(other: Self) -> Self {
         let generated =  Self::random();
         if generated == other {
             return Self::random_without(other);
