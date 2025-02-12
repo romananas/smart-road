@@ -2,7 +2,6 @@ use sdl2::rect::{Rect, Point};
 use sdl2::render::Canvas;
 use sdl2::pixels::Color;
 use sdl2::video::Window;
-use sdl2::render::Texture;
 
 use crate::display;
 
