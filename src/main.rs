@@ -10,6 +10,9 @@ use std::time::Duration;
 
 use smart_road::{cars::*, display::Display};
 
+const CAR_DEF_WIDTH: u32= 20;
+const CAR_DEF_LENGHT: u32= 40;
+
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
@@ -30,10 +33,15 @@ fn main() -> Result<(), String> {
     let mut cars: Vec<(Car,Vec<Point>)> = Vec::new();
     
     'running: loop {
-        match events::handle(&mut event_pump) {
-            events::Type::Quit => break 'running,
+        use events::Type;
+        match events::handle(&mut event_pump)
+        {
+            Type::Quit => break 'running,
+            Type::SpawnCar(from,to) => {
+                cars.push(spwn::spwn(from, to, CAR_DEF_WIDTH, CAR_DEF_LENGHT).unwrap());
+            }
             _ => {},
-        }
+        };
 
         canvas.set_draw_color(sdl2::pixels::Color::BLACK);
         canvas.clear();
