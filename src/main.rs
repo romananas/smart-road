@@ -39,6 +39,7 @@ fn main() -> Result<(), String> {
             _ => {},
         }
 
+        canvas.set_draw_color(sdl2::pixels::Color::BLACK);
         canvas.clear();
 
         canvas.copy(&background, None, None)?;
