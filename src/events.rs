@@ -8,7 +8,7 @@ use crate::cars;
 
 #[allow(dead_code)]
 pub enum Type {
-    SpawnCar((cars::Direction,cars::Direction)), // direction : from,to
+    SpawnCar(cars::Direction,cars::Direction), // direction : from,to
     Quit, // to quit the program
     None, // nothing happen
 }
@@ -33,11 +33,11 @@ pub fn handle(ep: &mut EventPump) -> Type {
                 keycode: Some(Keycode::ESCAPE),
                 ..
             } => return Type::Quit,
-            Event::KeyDown { keycode: Some(Keycode::UP), .. } => return Type::SpawnCar((Direction::North,gen_rand_direction())),
-            Event::KeyDown { keycode: Some(Keycode::DOWN), .. } => return Type::SpawnCar((Direction::South,gen_rand_direction())),
-            Event::KeyDown { keycode: Some(Keycode::RIGHT), .. } => return Type::SpawnCar((Direction::East,gen_rand_direction())),
-            Event::KeyDown { keycode: Some(Keycode::LEFT), .. } =>return Type::SpawnCar((Direction::West,gen_rand_direction())),
-            Event::KeyDown { keycode: Some(Keycode::R), .. } =>return Type::SpawnCar((gen_rand_direction(),gen_rand_direction())),
+            Event::KeyDown { keycode: Some(Keycode::UP), .. } => return Type::SpawnCar(Direction::North,gen_rand_direction()),
+            Event::KeyDown { keycode: Some(Keycode::DOWN), .. } => return Type::SpawnCar(Direction::South,gen_rand_direction()),
+            Event::KeyDown { keycode: Some(Keycode::RIGHT), .. } => return Type::SpawnCar(Direction::East,gen_rand_direction()),
+            Event::KeyDown { keycode: Some(Keycode::LEFT), .. } =>return Type::SpawnCar(Direction::West,gen_rand_direction()),
+            Event::KeyDown { keycode: Some(Keycode::R), .. } =>return Type::SpawnCar(gen_rand_direction(),gen_rand_direction()),
             _ => return Type::None,
         }
     };
