@@ -31,6 +31,7 @@ fn main() -> Result<(), String> {
 
     let texture_creator = canvas.texture_creator();
     let background = texture_creator.load_texture("assets/road.png")?;
+
     
     'running: loop {
         match events::handle(&mut event_pump) {
@@ -41,7 +42,6 @@ fn main() -> Result<(), String> {
         canvas.clear();
 
         canvas.copy(&background, None, None)?;
-
         // car.go_to(Point::new(1100, 550));
 
         let _ = car.display(&mut canvas);
