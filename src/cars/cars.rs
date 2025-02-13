@@ -7,7 +7,7 @@ use crate::display;
 
 #[allow(dead_code)]
 
-const BASE_VELOCITY: u32 = 2;
+pub const BASE_VELOCITY: u32 = 2;
 const _SLOWING_VELOCITY: u32 = BASE_VELOCITY / 2;
 
 pub static DEBUG: bool = true;
@@ -34,9 +34,17 @@ pub enum Direction {
     West,
 }
 
+#[derive(Clone, Copy, Debug,PartialEq, Eq)]
+pub enum Cmp {
+    Same,
+    Crossing,
+    Opposed,
+}
+
 
 #[allow(dead_code)]
 impl Direction {
+    /// Generate a random direction
     pub fn random() -> Self {
         match rand::random_range(0..=3) {
             0 => Self::North,
@@ -46,6 +54,7 @@ impl Direction {
         }
     }
 
+    /// Generate a random direction but no the choosen one.
     pub fn random_without(other: Self) -> Self {
         let generated =  Self::random();
         if generated == other {
@@ -53,8 +62,18 @@ impl Direction {
         }
         generated
     }
+
+    pub fn cmp(&self,other: Self) -> Cmp {
+        use Direction::*;
+        match (self,other) {
+            (North,North) | (South,South) | (East,East) | (West,West) => Cmp::Same,
+            (North,South) | (South,North) | (East,West) | (West,East) => Cmp::Opposed,
+            _ => Cmp::Crossing,
+        }
+    }
 }
 
+#[derive(Clone, Copy, Debug,PartialEq)]
 pub struct Car {
     pub velocity: u32, // pixels/refresh
     collision_box: Rect,
@@ -80,6 +99,10 @@ impl Car {
 
             is_detecting: None,
         }
+    }
+
+    pub fn get_direction(&self) -> Direction {
+        return self.direction;
     }
 
     pub fn set_direction(&mut self,direction: Direction) {
@@ -198,6 +221,10 @@ impl Car {
                 None => println!("No car detected"),
             }
         }
+    }
+
+    pub fn cmp(&self, other: Self) -> Cmp {
+        self.direction.cmp(other.direction)
     }
     
 }
