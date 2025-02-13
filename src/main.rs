@@ -13,6 +13,23 @@ use smart_road::{cars::*, display::Display};
 const CAR_DEF_WIDTH: u32= 20;
 const CAR_DEF_LENGHT: u32= 40;
 
+fn logic(car: &mut cars::Car,others: Vec<cars::Car>) {
+    for other in others {
+        if car.has_intersection(&other) == Some(cars::IntersectionType::SawCollisionBox) {
+            car.velocity = other.velocity;
+            return;
+        }
+        if car.has_intersection(&other) == Some(cars::IntersectionType::SawDetectionBox) && car.cmp(other) == cars::Cmp::Crossing {
+            use cars::Direction::*;
+            match (car.get_direction(),other.get_direction()) {
+                (North,West) | (South,East) | (East,North) | (West,South) => car.velocity = other.velocity/ 2,
+                _ => {},
+            }
+        }
+    }
+    car.velocity = cars::BASE_VELOCITY;
+}
+
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
@@ -49,6 +66,13 @@ fn main() -> Result<(), String> {
         canvas.copy(&background, None, None)?;
 
         cars.retain_mut(|(car, path)| !car.follow(path));
+        let cloned_cars = cars.iter().map(|(c,_)| c.clone()).collect::<Vec<Car>>();
+        for (i, cp) in cars.iter_mut().enumerate() {
+            let mut tmp = cloned_cars.clone();
+            tmp.remove(i);
+            logic(&mut cp.0, tmp);
+
+        }
         cars.iter().for_each(|(c,_)| {let _ = c.display(&mut canvas);});
 
         canvas.present();
