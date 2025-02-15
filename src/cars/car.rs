@@ -1,4 +1,4 @@
-use sdl2::{pixels::Color, rect::{Point, Rect}, sys::True};
+use sdl2::{pixels::Color, rect::{Point, Rect}};
 use crate::entities::*;
 
 const BASE_VELOCITY: u32 = 4;
