@@ -47,7 +47,7 @@ fn main() -> Result<(), String> {
         {
             events::Type::SpawnCar(from,to) => {
                 if now.elapsed() >= Duration::from_millis(COOLDOWN_MS) {
-                    cars.push(map::spawn_car(from, to, 32).unwrap());
+                    cars.push(map::spawn_car(from, to, 32,45).unwrap());
                     car_spawned += 1;
                     now = std::time::Instant::now();
                 }

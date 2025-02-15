@@ -99,9 +99,9 @@ fn get_points(from: Direction,to: Direction) -> Result<(Point,Vec<Point>),String
     Ok((Point::new(points[0].0, points[0].1),vec![Point::new(points[1].0, points[1].1),Point::new(points[2].0, points[2].1)]))
 }
 
-pub fn spawn_car(from: Direction, to: Direction, car_s: u32) -> Result<Car,String> {
+pub fn spawn_car(from: Direction, to: Direction, car_w: u32,car_l: u32) -> Result<Car,String> {
     let (strt,path) = get_points(from, to)?;
-    let mut car = Car::new(strt, car_s, car_s, sdl2::pixels::Color::BLUE);
+    let mut car = Car::new(strt, car_w, car_l, sdl2::pixels::Color::BLUE);
     car.set_path(path);
     Ok(car)
 }

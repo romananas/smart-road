@@ -1,4 +1,4 @@
-use sdl2::{pixels::Color, rect::{Point, Rect}};
+use sdl2::{pixels::Color, rect::{Point, Rect}, sys::True};
 use crate::entities::*;
 
 const BASE_VELOCITY: u32 = 4;
@@ -22,6 +22,14 @@ pub enum UpdateState {
     Waiting,
 }
 
+#[derive(Debug,PartialEq,Clone, Copy)]
+enum Direction {
+    North,
+    South,
+    West,
+    East,
+}
+
 #[derive(Debug,Clone)]
 pub struct Car {
     hit_box: Rect,
@@ -29,8 +37,8 @@ pub struct Car {
     detection_upper: Rect,
     sprite: DisplayType,
     state: UpdateState,
-    _rotation: u16,
     velocity: u32,
+    w_l: (u32,u32),
 
     path: Vec<Point>
 }
@@ -47,8 +55,8 @@ impl Car {
         let hit_box = Rect::from_center(center, w, l);
         Self {
             hit_box: hit_box,
+            w_l: (w,l),
             sprite: sprite.into(),
-            _rotation: 0,
             velocity: BASE_VELOCITY,
             state: UpdateState::Moving,
             path: Vec::new(),
@@ -82,7 +90,15 @@ impl Car {
             (target.x - position.x) as f32,
             (target.y - position.y) as f32,
         );
-    
+
+        let card_direction = match (direction.0.abs() > direction.1.abs(),direction.0 < 0.0,direction.1 < 0.0) {
+            (true,false,_) => Direction::East,
+            (true,true,_) => Direction::West,
+            (false,_,true) => Direction::South,
+            (false,_,false) => Direction::North,
+            // _ => Direction::North,
+        };
+
         let distance = (direction.0.powi(2) + direction.1.powi(2)).sqrt();
     
         if distance < self.velocity as f32 {
@@ -95,11 +111,19 @@ impl Car {
                 (normalized.1 * self.velocity as f32) as i32,
             );
 
-            let new_hitbox = Rect::from_center(
-                Point::new(position.x + movement.0, position.y + movement.1),
-                self.hit_box.width(),
-                self.hit_box.height(),
-            );
+            let new_hitbox = if card_direction == Direction::North || card_direction == Direction::South {
+                Rect::from_center(
+                    Point::new(position.x + movement.0, position.y + movement.1),
+                    self.w_l.0,
+                    self.w_l.1,
+                )
+            } else {
+                Rect::from_center(
+                    Point::new(position.x + movement.0, position.y + movement.1),
+                    self.w_l.1,
+                    self.w_l.0,
+                )
+            };
     
             // **1. Calculer l'angle de la direction**
             let angle = direction.1.atan2(direction.0); // atan2(y, x) donne l'angle en radians
