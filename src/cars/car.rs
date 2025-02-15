@@ -91,12 +91,11 @@ impl Car {
             (target.y - position.y) as f32,
         );
 
-        let card_direction = match (direction.0.abs() > direction.1.abs(),direction.0 < 0.0,direction.1 < 0.0) {
+        let card_direction = match (direction.0.abs() > direction.1.abs(),direction.0 <= 0.0,direction.1 <= 0.0) {
             (true,false,_) => Direction::East,
             (true,true,_) => Direction::West,
             (false,_,true) => Direction::South,
             (false,_,false) => Direction::North,
-            // _ => Direction::North,
         };
 
         let distance = (direction.0.powi(2) + direction.1.powi(2)).sqrt();
@@ -130,9 +129,13 @@ impl Car {
     
             // **2. Calculer un vecteur perpendiculaire pour décaler à droite**
             let perpendicular = (-angle.sin(), angle.cos()); // Rotation de 90° (droite)
-    
+            let inc = if card_direction == Direction::North || card_direction == Direction::South {
+                new_hitbox.height()
+            } else {
+                new_hitbox.width()
+            };
             // **3. Placer la zone de détection devant et à droite**
-            let detection_distance = self.hit_box.width() as f32 * 1.5 ; // Distance devant
+            let detection_distance = inc as f32 * 1.5; // Distance devant
             let detection_x = position.x as f32 + detection_distance * angle.cos()
                 + DETECTION_OFFSET as f32 * perpendicular.0;
             let detection_y = position.y as f32 + detection_distance * angle.sin()
@@ -145,7 +148,7 @@ impl Car {
                 self.hit_box.height() + SAFE_DISTANCE,
             );
             
-            let detection_distance = self.hit_box.width() as f32 * 3.0 ; // Distance devant
+            let detection_distance = inc as f32 * 3.0 ; // Distance devant
             let detection_x = position.x as f32 + detection_distance * angle.cos()
                 + DETECTION_OFFSET as f32 * perpendicular.0;
             let detection_y = position.y as f32 + detection_distance * angle.sin()
