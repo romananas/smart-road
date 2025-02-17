@@ -59,7 +59,8 @@ fn main() -> Result<(), String> {
         canvas.set_draw_color(sdl2::pixels::Color::BLACK);
         canvas.clear();
 
-        map::show_points(&mut canvas)?;
+        // map::show_points(&mut canvas)?;
+        map::load_map(&mut canvas)?;
 
         let cars_clone = cars.clone();
         let mut to_remove = -1;

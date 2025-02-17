@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use sdl2::{pixels::Color, rect::{Point, Rect}, render::Canvas, video::Window};
+use sdl2::{image::LoadTexture, pixels::Color, rect::{Point, Rect}, render::Canvas, video::Window};
 use crate::cars::Car;
 
 const BORDER_UP_LEFT: i32 = 20;
@@ -104,4 +104,15 @@ pub fn spawn_car(from: Direction, to: Direction, car_w: u32,car_l: u32) -> Resul
     let mut car = Car::new(strt, car_w, car_l, sdl2::pixels::Color::BLUE);
     car.set_path(path);
     Ok(car)
+}
+
+
+pub fn load_map(canvas : &mut Canvas<Window>) -> Result<(), String> {
+    let texture_creator = canvas.texture_creator();
+
+    let texture = texture_creator.load_texture("assets/road.png")?;
+
+    canvas.copy(&texture, None, None)?;
+
+    Ok(())
 }
