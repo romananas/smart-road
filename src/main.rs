@@ -10,7 +10,7 @@ use sdl2::{pixels::Color, video::Window};
 use entities::Entity;
 
 const SCREEN_SIZE: (u32,u32) = (1100,1100);
-const COOLDOWN_MS: u64 = 400;
+const COOLDOWN_MS: u64 = 600;
 const DEBUG: bool = true;
 
 fn init_window(sdl_context: sdl2::Sdl) -> Result<Window,String> {

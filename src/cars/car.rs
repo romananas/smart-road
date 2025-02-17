@@ -135,7 +135,7 @@ impl Car {
                 new_hitbox.width()
             };
             // **3. Placer la zone de détection devant et à droite**
-            let detection_distance = inc as f32 * 1.5; // Distance devant
+            let detection_distance = inc as f32 * 1.4; // Distance devant
             let detection_x = position.x as f32 + detection_distance * angle.cos()
                 + DETECTION_OFFSET as f32 * perpendicular.0;
             let detection_y = position.y as f32 + detection_distance * angle.sin()
@@ -148,7 +148,7 @@ impl Car {
                 self.hit_box.height() + SAFE_DISTANCE,
             );
             
-            let detection_distance = inc as f32 * 3.0 ; // Distance devant
+            let detection_distance = inc as f32 * 2.8 ; // Distance devant
             let detection_x = position.x as f32 + detection_distance * angle.cos()
                 + DETECTION_OFFSET as f32 * perpendicular.0;
             let detection_y = position.y as f32 + detection_distance * angle.sin()
@@ -174,7 +174,7 @@ impl Car {
                     self.hit_box = new_hitbox;
                     return UpdateState::Slowing;
                 }
-                if ahead_box_lower.has_intersection(other.get_hitbox()) || ahead_box_upper.has_intersection(other.detection_lower) {
+                if ahead_box_lower.has_intersection(other.get_hitbox()) || ahead_box_upper.has_intersection(other.detection_lower) || ahead_box_upper.has_intersection(other.get_hitbox()) {
                     self.state = UpdateState::Waiting;
                     return UpdateState::Waiting; // Risque Collision détectée, on ne bouge pas
                 }
