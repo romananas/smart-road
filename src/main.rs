@@ -54,7 +54,9 @@ fn main() -> Result<(), String> {
                 if now.elapsed() >= Duration::from_millis(COOLDOWN_MS) {
                     let mut tmp = map::spawn_car(from, to, 32,45).unwrap();
                     tmp.set_texture(&car_texture);
+                    cars.push(tmp);
                     now = std::time::Instant::now();
+                    car_spawned += 1;
                 }
             },
             events::Type::Quit => break 'running,
@@ -106,7 +108,7 @@ fn main() -> Result<(), String> {
         }
 
         canvas.present();
-        std::thread::sleep(Duration::from_nanos(1_000_000_000u64 / 60));
+        std::thread::sleep(Duration::from_nanos(160));
     }
 
     println!("\ncar spawned : {}\ncar passed  : {}\ncollisions  : {}\n",car_passed,car_spawned,collisions_count);
