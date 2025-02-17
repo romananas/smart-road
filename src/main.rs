@@ -99,7 +99,7 @@ fn main() -> Result<(), String> {
         }
 
         canvas.present();
-        std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
+        std::thread::sleep(Duration::from_nanos(1_000_000_000u64 / 60));
     }
 
     println!("\ncar spawned : {}\ncar passed  : {}\ncollisions  : {}\n",car_passed,car_spawned,collisions_count);
