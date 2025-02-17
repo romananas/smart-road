@@ -25,6 +25,7 @@ fn init_window(sdl_context: sdl2::Sdl) -> Result<Window,String> {
     Ok(window)
 }
 
+
 fn main() -> Result<(), String> {
     // let mut ctrl = entities::Controller::init();
 
@@ -47,7 +48,7 @@ fn main() -> Result<(), String> {
         {
             events::Type::SpawnCar(from,to) => {
                 if now.elapsed() >= Duration::from_millis(COOLDOWN_MS) {
-                    cars.push(map::spawn_car(from, to, 32,45).unwrap());
+                    cars.push(map::spawn_car(from, to, 32,45, true, &mut canvas).unwrap());
                     car_spawned += 1;
                     now = std::time::Instant::now();
                 }

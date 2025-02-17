@@ -1,15 +1,16 @@
 use sdl2::{pixels::Color, rect::{Point, Rect}};
 use crate::entities::*;
+use sdl2::render::Texture;
+
 
 const BASE_VELOCITY: u32 = 4;
 const SLOW_VELOCITY: u32 = BASE_VELOCITY ;
 const SAFE_DISTANCE: u32 = 20;
 const DETECTION_OFFSET: i32 = -0;
 
-#[derive(Debug,Clone)]
-pub enum DisplayType {
+pub enum DisplayType<'a> {
+    Texture(Texture<'a>),
     Color(Color),
-    // Texture(Texture<'a>),
 }
 
 #[derive(Debug,Clone,PartialEq, Eq)]
@@ -31,27 +32,22 @@ enum Direction {
 }
 
 #[derive(Debug,Clone)]
-pub struct Car {
+pub struct Car<'a> {
     hit_box: Rect,
     detection_lower: Rect,
     detection_upper: Rect,
-    sprite: DisplayType,
+    sprite: DisplayType<'a>,
     state: UpdateState,
     velocity: u32,
     w_l: (u32,u32),
 
-    path: Vec<Point>
+    path: Vec<Point>,
+    texture: Option<Texture<'a>>,
 }
 
 
-impl From<Color> for DisplayType{
-    fn from(color: Color) -> Self {
-        DisplayType::Color(color)
-    }
-}
-
-impl Car {
-    pub fn new<T: Into<DisplayType>>(center: Point, w: u32, l: u32, sprite: T) -> Self {
+impl<'a> Car<'a> {
+    pub fn new<T: Into<DisplayType<'a>>>(center: Point, w: u32, l: u32, sprite: T) -> Self {
         let hit_box = Rect::from_center(center, w, l);
         Self {
             hit_box: hit_box,
@@ -62,6 +58,7 @@ impl Car {
             path: Vec::new(),
             detection_lower: hit_box,
             detection_upper: hit_box,
+            texture: None,
         }
     }
 
@@ -190,16 +187,10 @@ impl Car {
 
 }
 
-impl Entity for Car {
+impl<'a> Entity for Car<'a> {
     fn display(&self, canvas: &mut sdl2::render::Canvas<sdl2::video::Window>) -> Result<(), Box<dyn std::error::Error>> {
-        if matches!(self.sprite, DisplayType::Color(_)) {
-
-            // *! Will be used if texture is implemented
-            #[allow(irrefutable_let_patterns)]
-            if let DisplayType::Color(color) = self.sprite {
-                canvas.set_draw_color(color);
-            }
-            canvas.fill_rect(self.hit_box)?;
+        if let DisplayType::Texture(texture) = &self.sprite {
+            canvas.copy(texture, None, Some(self.hit_box))?;
             return Ok(());
         }
         Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Texture is not implemented yet")))

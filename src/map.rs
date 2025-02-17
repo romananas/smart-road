@@ -3,6 +3,9 @@
 use sdl2::{image::LoadTexture, pixels::Color, rect::{Point, Rect}, render::Canvas, video::Window};
 use crate::cars::Car;
 
+use crate::cars::DisplayType;
+
+
 const BORDER_UP_LEFT: i32 = 20;
 const BORDER_DOWN_RIGHT: i32 = 1080;
 
@@ -99,12 +102,30 @@ fn get_points(from: Direction,to: Direction) -> Result<(Point,Vec<Point>),String
     Ok((Point::new(points[0].0, points[0].1),vec![Point::new(points[1].0, points[1].1),Point::new(points[2].0, points[2].1)]))
 }
 
-pub fn spawn_car(from: Direction, to: Direction, car_w: u32,car_l: u32) -> Result<Car,String> {
-    let (strt,path) = get_points(from, to)?;
-    let mut car = Car::new(strt, car_w, car_l, sdl2::pixels::Color::BLUE);
+
+pub fn spawn_car<'a>(from: Direction, to: Direction, car_w: u32, car_l: u32, use_texture: bool, canvas: &mut Canvas<Window>) -> Result<Car<'a>, String> {
+    let (strt, path) = get_points(from, to)?;
+
+    let mut car: Car<'a>;
+
+    if use_texture {
+        let texture_creator = canvas.texture_creator();
+        match texture_creator.load_texture("assets/car.png") {
+            Ok(texture) => {
+                car = Car::new(strt, car_w, car_l, DisplayType::Texture(texture));
+            },
+            Err(_) => {
+                car = Car::new(strt, car_w, car_l, DisplayType::Color(Color::BLUE));  // Fallback to blue
+            }
+        }
+    } else {
+        car = Car::new(strt, car_w, car_l, DisplayType::Color(Color::BLUE));  // Default color is blue
+    }
+
     car.set_path(path);
     Ok(car)
 }
+
 
 
 pub fn load_map(canvas : &mut Canvas<Window>) -> Result<(), String> {
