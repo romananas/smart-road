@@ -12,7 +12,7 @@ const DETECTION_OFFSET: i32 = -0;
 
 // #[derive(Debug,Clone)]
 pub enum DisplayType<'a> {
-    Texture(Rc<Texture<'a>>),
+    Texture(Rc<&'a Texture<'a>>),
     Color(Color),
 }
 
@@ -57,6 +57,18 @@ pub struct Car<'a> {
     // texture: Option<Texture<'a>>,
 }
 
+impl<'a> From<&'a Texture<'a>> for DisplayType<'a> {
+    fn from(texture: &'a Texture<'a>) -> Self {
+        DisplayType::Texture(Rc::new(texture))
+    }
+}
+
+impl<'a> From<Color> for DisplayType<'a> {
+    fn from(c: Color) -> Self {
+        DisplayType::Color(c)
+    }
+}
+
 
 impl<'a> Car<'a> {
     pub fn new<T: Into<DisplayType<'a>>>(center: Point, w: u32, l: u32, sprite: T) -> Self {
@@ -70,7 +82,6 @@ impl<'a> Car<'a> {
             path: Vec::new(),
             detection_lower: hit_box,
             detection_upper: hit_box,
-            // texture: None,
         }
     }
 
@@ -84,6 +95,10 @@ impl<'a> Car<'a> {
 
     pub fn get_detections(&self) -> Option<(Rect,Rect)>{
         Some((self.detection_lower,self.detection_upper))  
+    }
+
+    pub fn set_texture(&mut self,texture: &'a Texture<'a>) {
+        self.sprite = DisplayType::from(texture);
     }
 
     pub fn update(&mut self, others: Vec<Car>) -> UpdateState {
@@ -198,6 +213,7 @@ impl<'a> Car<'a> {
     }
 
 }
+
 
 impl<'a> Entity for Car<'a> {
     fn display(&self, canvas: &mut sdl2::render::Canvas<sdl2::video::Window>) -> Result<(), Box<dyn std::error::Error>> {

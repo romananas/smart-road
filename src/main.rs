@@ -5,7 +5,7 @@ mod map;
 
 use std::time::Duration;
 use cars::UpdateState;
-use sdl2::{pixels::Color, video::Window};
+use sdl2::{image::LoadTexture, pixels::Color, video::Window};
 
 use entities::Entity;
 
@@ -43,13 +43,17 @@ fn main() -> Result<(), String> {
 
     let mut collisions_count: u32 = 0u32;
 
+    let tc = canvas.texture_creator();
+    let car_texture = tc.load_texture("assets/car.png")?;
+
+
     'running: loop {
         match events::handle(&mut event_pump)
         {
             events::Type::SpawnCar(from,to) => {
                 if now.elapsed() >= Duration::from_millis(COOLDOWN_MS) {
-                    cars.push(map::spawn_car(from, to, 32,45, true, &mut canvas).unwrap());
-                    car_spawned += 1;
+                    let mut tmp = map::spawn_car(from, to, 32,45).unwrap();
+                    tmp.set_texture(&car_texture);
                     now = std::time::Instant::now();
                 }
             },
