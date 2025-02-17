@@ -43,7 +43,7 @@ enum Direction {
     East,
 }
 
-// #[derive(Debug,Clone)]
+#[derive(Clone)]
 pub struct Car<'a> {
     hit_box: Rect,
     detection_lower: Rect,
