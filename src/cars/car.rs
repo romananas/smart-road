@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use sdl2::{pixels::Color, rect::{Point, Rect}};
 use crate::entities::*;
 use sdl2::render::Texture;
@@ -8,9 +10,19 @@ const SLOW_VELOCITY: u32 = BASE_VELOCITY ;
 const SAFE_DISTANCE: u32 = 20;
 const DETECTION_OFFSET: i32 = -0;
 
+// #[derive(Debug,Clone)]
 pub enum DisplayType<'a> {
-    Texture(Texture<'a>),
+    Texture(Rc<Texture<'a>>),
     Color(Color),
+}
+
+impl Clone for DisplayType<'_> {
+    fn clone(&self) -> Self {
+       match *self {
+           DisplayType::Texture(ref t) => DisplayType::Texture(Rc::clone(t)),
+           DisplayType::Color(c) => DisplayType::Color(c),
+       }
+    }
 }
 
 #[derive(Debug,Clone,PartialEq, Eq)]
@@ -31,7 +43,7 @@ enum Direction {
     East,
 }
 
-#[derive(Debug,Clone)]
+// #[derive(Debug,Clone)]
 pub struct Car<'a> {
     hit_box: Rect,
     detection_lower: Rect,
@@ -42,7 +54,7 @@ pub struct Car<'a> {
     w_l: (u32,u32),
 
     path: Vec<Point>,
-    texture: Option<Texture<'a>>,
+    // texture: Option<Texture<'a>>,
 }
 
 
@@ -58,7 +70,7 @@ impl<'a> Car<'a> {
             path: Vec::new(),
             detection_lower: hit_box,
             detection_upper: hit_box,
-            texture: None,
+            // texture: None,
         }
     }
 
@@ -189,6 +201,11 @@ impl<'a> Car<'a> {
 
 impl<'a> Entity for Car<'a> {
     fn display(&self, canvas: &mut sdl2::render::Canvas<sdl2::video::Window>) -> Result<(), Box<dyn std::error::Error>> {
+        if let DisplayType::Color(c) = &self.sprite {
+            canvas.set_draw_color(*c);
+            canvas.fill_rect(self.get_hitbox())?;
+            return Ok(());
+        }
         if let DisplayType::Texture(texture) = &self.sprite {
             canvas.copy(texture, None, Some(self.hit_box))?;
             return Ok(());
