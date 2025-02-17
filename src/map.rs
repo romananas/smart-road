@@ -1,7 +1,10 @@
 #![allow(dead_code)]
 
-use sdl2::{pixels::Color, rect::{Point, Rect}, render::Canvas, video::Window};
+use sdl2::{image::LoadTexture, pixels::Color, rect::{Point, Rect}, render::Canvas, video::Window};
 use crate::cars::Car;
+
+use crate::cars::DisplayType;
+
 
 const BORDER_UP_LEFT: i32 = 20;
 const BORDER_DOWN_RIGHT: i32 = 1080;
@@ -10,24 +13,24 @@ const BORDER_DOWN_RIGHT: i32 = 1080;
 // E : RIGHT
 
 // Done
-const N_S: [(i32,i32); 3] = [(430,BORDER_UP_LEFT),(430,430),(430,BORDER_DOWN_RIGHT)];
-const N_E: [(i32,i32); 3] = [(510,BORDER_UP_LEFT),(510,590),(BORDER_DOWN_RIGHT,590)];
-const N_W: [(i32,i32); 3] = [(350,BORDER_UP_LEFT),(350,350),(BORDER_UP_LEFT,350)];
+const N_S: [(i32,i32); 3] = [(440,BORDER_UP_LEFT),(440,440),(440,BORDER_DOWN_RIGHT)];
+const N_E: [(i32,i32); 3] = [(520,BORDER_UP_LEFT),(520,590),(BORDER_DOWN_RIGHT,590)];
+const N_W: [(i32,i32); 3] = [(360,BORDER_UP_LEFT),(360,360),(BORDER_UP_LEFT,360)];
 
 // Done
-const S_N: [(i32,i32); 3] = [(670,BORDER_DOWN_RIGHT),(670,670),(670,BORDER_UP_LEFT)];
-const S_E: [(i32,i32); 3] = [(750,BORDER_DOWN_RIGHT),(750,750),(BORDER_DOWN_RIGHT,750)];
-const S_W: [(i32,i32); 3] = [(590,BORDER_DOWN_RIGHT),(590,510),(BORDER_UP_LEFT,510)];
+const S_N: [(i32,i32); 3] = [(660,BORDER_DOWN_RIGHT),(660,660),(660,BORDER_UP_LEFT)];
+const S_E: [(i32,i32); 3] = [(730,BORDER_DOWN_RIGHT),(730,730),(BORDER_DOWN_RIGHT,730)];
+const S_W: [(i32,i32); 3] = [(580,BORDER_DOWN_RIGHT),(580,510),(BORDER_UP_LEFT,510)];
 
 // Done
 const E_W: [(i32,i32); 3] = [(BORDER_DOWN_RIGHT,430),(430,430),(BORDER_UP_LEFT,430)];
-const E_N: [(i32,i32); 3] = [(BORDER_DOWN_RIGHT,350),(750,350),(750,BORDER_UP_LEFT)];
+const E_N: [(i32,i32); 3] = [(BORDER_DOWN_RIGHT,360),(750,360),(750,BORDER_UP_LEFT)];
 const E_S: [(i32,i32); 3] = [(BORDER_DOWN_RIGHT,510),(510,510),(510,BORDER_DOWN_RIGHT)];
 
 // Not Done
-const W_E: [(i32,i32); 3] = [(BORDER_UP_LEFT,670),(670,670),(BORDER_DOWN_RIGHT,670)];
-const W_N: [(i32,i32); 3] = [(BORDER_UP_LEFT,590),(590,590),(590,BORDER_UP_LEFT)];
-const W_S: [(i32,i32); 3] = [(BORDER_UP_LEFT,750),(350,750),(350,BORDER_DOWN_RIGHT)];
+const W_E: [(i32,i32); 3] = [(BORDER_UP_LEFT,660),(660,660),(BORDER_DOWN_RIGHT,660)];
+const W_N: [(i32,i32); 3] = [(BORDER_UP_LEFT,580),(590,580),(590,BORDER_UP_LEFT)];
+const W_S: [(i32,i32); 3] = [(BORDER_UP_LEFT,740),(350,740),(350,BORDER_DOWN_RIGHT)];
 
 #[derive(Debug,PartialEq,Clone, Copy)]
 pub enum Direction {
@@ -99,9 +102,38 @@ fn get_points(from: Direction,to: Direction) -> Result<(Point,Vec<Point>),String
     Ok((Point::new(points[0].0, points[0].1),vec![Point::new(points[1].0, points[1].1),Point::new(points[2].0, points[2].1)]))
 }
 
-pub fn spawn_car(from: Direction, to: Direction, car_w: u32,car_l: u32) -> Result<Car,String> {
-    let (strt,path) = get_points(from, to)?;
-    let mut car = Car::new(strt, car_w, car_l, sdl2::pixels::Color::BLUE);
+
+pub fn spawn_car<'a>(from: Direction, to: Direction, car_w: u32, car_l: u32, use_texture: bool, canvas: &mut Canvas<Window>) -> Result<Car<'a>, String> {
+    let (strt, path) = get_points(from, to)?;
+
+    let mut car: Car<'a>;
+
+    if use_texture {
+        let texture_creator = canvas.texture_creator();
+        match texture_creator.load_texture("assets/car.png") {
+            Ok(texture) => {
+                car = Car::new(strt, car_w, car_l, DisplayType::Texture(texture));
+            },
+            Err(_) => {
+                car = Car::new(strt, car_w, car_l, DisplayType::Color(Color::BLUE));  // Fallback to blue
+            }
+        }
+    } else {
+        car = Car::new(strt, car_w, car_l, DisplayType::Color(Color::BLUE));  // Default color is blue
+    }
+
     car.set_path(path);
     Ok(car)
+}
+
+
+
+pub fn load_map(canvas : &mut Canvas<Window>) -> Result<(), String> {
+    let texture_creator = canvas.texture_creator();
+
+    let texture = texture_creator.load_texture("assets/road.png")?;
+
+    canvas.copy(&texture, None, None)?;
+
+    Ok(())
 }
