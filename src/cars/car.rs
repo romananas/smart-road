@@ -10,6 +10,8 @@ const SLOW_VELOCITY: u32 = BASE_VELOCITY ;
 const SAFE_DISTANCE: u32 = 20;
 const DETECTION_OFFSET: i32 = -0;
 
+const TRECTS: [(i32,i32,u32,u32);2] = [(179,89,25,47),(290,199,28,55)];
+
 // #[derive(Debug,Clone)]
 pub enum DisplayType<'a> {
     Texture(Rc<&'a Texture<'a>>),
@@ -45,16 +47,22 @@ pub enum Direction {
 
 #[derive(Clone)]
 pub struct Car<'a> {
+    // Boxs
     hit_box: Rect,
     detection_lower: Rect,
     detection_upper: Rect,
+
+    // Visual
     sprite: DisplayType<'a>,
+    t_rect: Option<Rect>,
+
+    // Logic
     state: UpdateState,
     velocity: u32,
     w_l: (u32,u32),
-    
     path: Vec<Point>,
     current_direction: Direction,
+
     debug : bool
 }
 
@@ -96,8 +104,9 @@ impl<'a> Car<'a> {
             path: Vec::new(),
             detection_lower: hit_box,
             detection_upper: hit_box,
-            current_direction: Direction::North, 
+            current_direction: Direction::North,
             debug: false,
+            t_rect: None,
         }
     }
 
@@ -129,6 +138,9 @@ impl<'a> Car<'a> {
 
     pub fn set_texture(&mut self,texture: &'a Texture<'a>) {
         self.sprite = DisplayType::from(texture);
+        let i: usize = rand::random_range(0..TRECTS.len());
+        let v = TRECTS[i];
+        self.t_rect = Some(Rect::new(v.0, v.1, v.2, v.3))
     }
 
     pub fn update(&mut self, others: Vec<Car>) -> UpdateState {
@@ -266,7 +278,7 @@ impl<'a> Entity for Car<'a> {
             }
             canvas.copy_ex(
                 texture, 
-                Rect::new(179, 89, 25, 47), 
+                self.t_rect, 
                 Some(Rect::from_center(self.hit_box.center(),self.w_l.0,self.w_l.1)), 
                 angle, 
                 None, 
