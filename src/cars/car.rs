@@ -258,7 +258,7 @@ impl<'a> Car<'a> {
                     return UpdateState::Slowing;
                 }
                 if ahead_box_lower.has_intersection(other.get_hitbox()) || ahead_box_upper.has_intersection(other.detection_lower) || ahead_box_upper.has_intersection(other.get_hitbox()) {
-                    if other.state == UpdateState::Waiting && self.is_on_right(other) {
+                    if other.state == UpdateState::Waiting && self.is_on_right(other) && !(ahead_box_lower.has_intersection(other.get_hitbox())){
                         continue;
                     }
                     self.state = UpdateState::Waiting;

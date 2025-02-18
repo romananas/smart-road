@@ -10,7 +10,7 @@ use sdl2::{image::LoadTexture, pixels::Color, video::Window};
 use entities::Entity;
 
 const SCREEN_SIZE: (u32,u32) = (1100,1100);
-const COOLDOWN_MS: u64 = 500;
+const COOLDOWN_MS: u64 = 450;
 const TICK_SPEED: u32 = 60;
 const VELOCITY_P_S:u32 = 240;
 // const DEBUG: bool = true;
