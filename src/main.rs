@@ -11,7 +11,7 @@ use entities::Entity;
 
 const SCREEN_SIZE: (u32,u32) = (1100,1100);
 const COOLDOWN_MS: u64 = 600;
-const DEBUG: bool = true;
+// const DEBUG: bool = true;
 
 fn init_window(sdl_context: sdl2::Sdl) -> Result<Window,String> {
     let video_subsystem = sdl_context.video()?;
@@ -78,7 +78,7 @@ fn main() -> Result<(), String> {
             match  c.update(tmp) {
                 UpdateState::Finished => to_remove = i as i32,
                 UpdateState::Waiting => {
-                    let r = match (DEBUG,c.get_detections()) {
+                    let r = match (cars::DEBUG,c.get_detections()) {
                         (true,Some((l,u))) => (l,u),
                         _ => break,
                     };
@@ -91,7 +91,7 @@ fn main() -> Result<(), String> {
                     to_remove = i as i32;
                 },
                 _ => {
-                    let r = match (DEBUG,c.get_detections()) {
+                    let r = match (cars::DEBUG,c.get_detections()) {
                         (true,Some((l,u))) => (l,u),
                         _ => break,
                     };
@@ -100,7 +100,7 @@ fn main() -> Result<(), String> {
                     canvas.draw_rect(r.1).unwrap();
                 },
             }
-            println!("{:?}",c.current_direction);
+            // println!("{:?}",c.current_direction);
             c.display(&mut canvas).unwrap();
         }
         if to_remove != -1 {

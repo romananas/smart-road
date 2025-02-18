@@ -3,14 +3,13 @@ use std::rc::Rc;
 use sdl2::{pixels::Color, rect::{Point, Rect}};
 use crate::entities::*;
 use sdl2::render::Texture;
-use crate::map::Direction as OtherDirection;
-
 
 
 const BASE_VELOCITY: u32 = 4;
 const SLOW_VELOCITY: u32 = BASE_VELOCITY ;
 const SAFE_DISTANCE: u32 = 20;
 const DETECTION_OFFSET: i32 = -0;
+pub const DEBUG: bool = false;
 
 // #[derive(Debug,Clone)]
 pub enum DisplayType<'a> {
@@ -244,10 +243,14 @@ impl<'a> Entity for Car<'a> {
         }
         if let DisplayType::Texture(texture) = &self.sprite {
             let angle = self.current_direction.to_angle();
+            if DEBUG {
+                canvas.set_draw_color(Color::GREEN);
+                canvas.draw_rect(self.hit_box)?;
+            }
             canvas.copy_ex(
                 texture, 
                 None, 
-                Some(self.hit_box), 
+                Some(Rect::from_center(self.hit_box.center(),self.w_l.0,self.w_l.1)), 
                 angle, 
                 None, 
                 false, 
