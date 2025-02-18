@@ -3,8 +3,8 @@
 use sdl2::{image::LoadTexture, pixels::Color, rect::{Point, Rect}, render::Canvas, video::Window};
 use crate::cars::Car;
 
-const BORDER_UP_LEFT: i32 = 20;
-const BORDER_DOWN_RIGHT: i32 = 1080;
+const BORDER_UP_LEFT: i32 = -40;
+const BORDER_DOWN_RIGHT: i32 = 1100;
 
 // W : LEFT
 // E : RIGHT
