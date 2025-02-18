@@ -3,6 +3,8 @@ use std::rc::Rc;
 use sdl2::{pixels::Color, rect::{Point, Rect}};
 use crate::entities::*;
 use sdl2::render::Texture;
+use crate::map::Direction as OtherDirection;
+
 
 
 const BASE_VELOCITY: u32 = 4;
@@ -36,7 +38,7 @@ pub enum UpdateState {
 }
 
 #[derive(Debug,PartialEq,Clone, Copy)]
-enum Direction {
+pub enum Direction {
     North,
     South,
     West,
@@ -54,6 +56,7 @@ pub struct Car<'a> {
     w_l: (u32,u32),
 
     path: Vec<Point>,
+    pub current_direction: Direction,
     // texture: Option<Texture<'a>>,
 }
 
@@ -70,6 +73,19 @@ impl<'a> From<Color> for DisplayType<'a> {
 }
 
 
+
+impl Direction {
+    pub fn to_angle(&self) -> f64 {
+        match self {
+            Direction::East => 100.0,
+            Direction::South => 270.0,
+            Direction::West => 180.0,
+            Direction::North => 90.0,
+        }
+    }
+}
+
+
 impl<'a> Car<'a> {
     pub fn new<T: Into<DisplayType<'a>>>(center: Point, w: u32, l: u32, sprite: T) -> Self {
         let hit_box = Rect::from_center(center, w, l);
@@ -82,6 +98,7 @@ impl<'a> Car<'a> {
             path: Vec::new(),
             detection_lower: hit_box,
             detection_upper: hit_box,
+            current_direction: Direction::North, 
         }
     }
 
@@ -121,6 +138,9 @@ impl<'a> Car<'a> {
             (false,_,true) => Direction::South,
             (false,_,false) => Direction::North,
         };
+
+        self.current_direction = card_direction;
+
 
         let distance = (direction.0.powi(2) + direction.1.powi(2)).sqrt();
     
@@ -223,7 +243,16 @@ impl<'a> Entity for Car<'a> {
             return Ok(());
         }
         if let DisplayType::Texture(texture) = &self.sprite {
-            canvas.copy(texture, None, Some(self.hit_box))?;
+            let angle = self.current_direction.to_angle();
+            canvas.copy_ex(
+                texture, 
+                None, 
+                Some(self.hit_box), 
+                angle, 
+                None, 
+                false, 
+                false
+            )?;
             return Ok(());
         }
         Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Texture is not implemented yet")))

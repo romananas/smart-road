@@ -113,6 +113,7 @@ pub fn load_map(canvas : &mut Canvas<Window>) -> Result<(), String> {
 
     let texture = texture_creator.load_texture("assets/road.png")?;
 
+
     canvas.copy(&texture, None, None)?;
 
     Ok(())

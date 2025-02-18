@@ -100,6 +100,7 @@ fn main() -> Result<(), String> {
                     canvas.draw_rect(r.1).unwrap();
                 },
             }
+            println!("{:?}",c.current_direction);
             c.display(&mut canvas).unwrap();
         }
         if to_remove != -1 {
