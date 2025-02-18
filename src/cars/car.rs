@@ -77,10 +77,10 @@ impl<'a> From<Color> for DisplayType<'a> {
 impl Direction {
     pub fn to_angle(&self) -> f64 {
         match self {
-            Direction::East => 100.0,
-            Direction::South => 270.0,
-            Direction::West => 180.0,
-            Direction::North => 90.0,
+            Direction::East => 90.0,
+            Direction::South => 0.0,
+            Direction::West => -90.0,
+            Direction::North => 180.0,
         }
     }
 }
