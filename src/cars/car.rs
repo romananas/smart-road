@@ -112,9 +112,16 @@ impl<'a> Car<'a> {
     pub fn set_debug(&mut self,b: bool) {
         self.debug = b;
     }
-    // pub fn get_state(&self) -> UpdateState {
-    //     self.state.clone()
-    // }
+
+    fn is_on_right(&self,other: &Self) -> bool{
+        match (self.current_direction,other.current_direction) {
+            (Direction::South,Direction::East) => true,
+            (Direction::East,Direction::North) => true,
+            (Direction::North,Direction::West) => true,
+            (Direction::West,Direction::South) => true,
+            _ => false,
+        }
+    }
 
     pub fn get_detections(&self) -> Option<(Rect,Rect)>{
         Some((self.detection_lower,self.detection_upper))  
@@ -225,6 +232,9 @@ impl<'a> Car<'a> {
                     return UpdateState::Slowing;
                 }
                 if ahead_box_lower.has_intersection(other.get_hitbox()) || ahead_box_upper.has_intersection(other.detection_lower) || ahead_box_upper.has_intersection(other.get_hitbox()) {
+                    if other.state == UpdateState::Waiting && self.is_on_right(other) {
+                        continue;
+                    }
                     self.state = UpdateState::Waiting;
                     return UpdateState::Waiting; // Risque Collision détectée, on ne bouge pas
                 }
