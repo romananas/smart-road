@@ -45,6 +45,8 @@ fn main() -> Result<(), String> {
 
     let mut collisions_count: u32 = 0u32;
 
+    let mut debug = false;
+
     let tc = canvas.texture_creator();
     let car_texture = tc.load_texture("assets/car.png")?;
 
@@ -62,6 +64,9 @@ fn main() -> Result<(), String> {
                 }
             },
             events::Type::Quit => break 'running,
+            events::Type::ToggleDebug => {
+                debug= !debug;
+            }
             _ => {},
         };
 
@@ -80,7 +85,7 @@ fn main() -> Result<(), String> {
             match  c.update(tmp) {
                 UpdateState::Finished => to_remove = i as i32,
                 UpdateState::Waiting => {
-                    match (cars::DEBUG,c.get_detections()) {
+                    match (debug,c.get_detections()) {
                         (true,Some((l,u))) => {
                             canvas.set_draw_color(Color::RED);
                             canvas.draw_rect(l).unwrap();
@@ -94,7 +99,7 @@ fn main() -> Result<(), String> {
                     to_remove = i as i32;
                 },
                 _ => {
-                    match (cars::DEBUG,c.get_detections()) {
+                    match (debug,c.get_detections()) {
                         (true,Some((l,u))) => {
                             canvas.set_draw_color(Color::GRAY);
                             canvas.draw_rect(l).unwrap();
@@ -104,7 +109,7 @@ fn main() -> Result<(), String> {
                     };
                 },
             }
-
+            c.set_debug(debug);
             c.display(&mut canvas).unwrap();
         }
         if to_remove != -1 {

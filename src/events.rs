@@ -8,6 +8,7 @@ use crate::map::Direction;
 pub enum Type {
     Quit,
     SpawnCar(Direction,Direction),
+    ToggleDebug,
     None,
 }
 
@@ -19,6 +20,7 @@ pub fn handle(ep: &mut EventPump) -> Type {
                 keycode: Some(Keycode::ESCAPE),
                 ..
             } => return Type::Quit,
+            Event::KeyDown { keycode: Some(Keycode::D), .. } => return Type::ToggleDebug,
             Event::KeyDown { keycode: Some(Keycode::UP), .. } => return Type::SpawnCar(Direction::North,Direction::random_without(Direction::North)),
             Event::KeyDown { keycode: Some(Keycode::DOWN), .. } => return Type::SpawnCar(Direction::South,Direction::random_without(Direction::South)),
             Event::KeyDown { keycode: Some(Keycode::RIGHT), .. } => return Type::SpawnCar(Direction::East,Direction::random_without(Direction::East)),

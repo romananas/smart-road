@@ -9,7 +9,6 @@ const BASE_VELOCITY: u32 = 4;
 const SLOW_VELOCITY: u32 = BASE_VELOCITY ;
 const SAFE_DISTANCE: u32 = 20;
 const DETECTION_OFFSET: i32 = -0;
-pub const DEBUG: bool = false;
 
 // #[derive(Debug,Clone)]
 pub enum DisplayType<'a> {
@@ -55,8 +54,8 @@ pub struct Car<'a> {
     w_l: (u32,u32),
 
     path: Vec<Point>,
-    pub current_direction: Direction,
-    // texture: Option<Texture<'a>>,
+    current_direction: Direction,
+    debug : bool
 }
 
 impl<'a> From<&'a Texture<'a>> for DisplayType<'a> {
@@ -98,6 +97,7 @@ impl<'a> Car<'a> {
             detection_lower: hit_box,
             detection_upper: hit_box,
             current_direction: Direction::North, 
+            debug: false,
         }
     }
 
@@ -105,6 +105,9 @@ impl<'a> Car<'a> {
         self.path = path;
     }
 
+    pub fn set_debug(&mut self,b: bool) {
+        self.debug = b;
+    }
     // pub fn get_state(&self) -> UpdateState {
     //     self.state.clone()
     // }
@@ -243,7 +246,7 @@ impl<'a> Entity for Car<'a> {
         }
         if let DisplayType::Texture(texture) = &self.sprite {
             let angle = self.current_direction.to_angle();
-            if DEBUG {
+            if self.debug {
                 canvas.set_draw_color(Color::GREEN);
                 canvas.draw_rect(self.hit_box)?;
             }
