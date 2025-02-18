@@ -10,7 +10,21 @@ const SLOW_VELOCITY: u32 = BASE_VELOCITY ;
 const SAFE_DISTANCE: u32 = 20;
 const DETECTION_OFFSET: i32 = -0;
 
-const TRECTS: [(i32,i32,u32,u32);2] = [(179,89,25,47),(290,199,28,55)];
+const TRECTS: [(&str,i32,i32,u32,u32);12] = 
+[
+    ("bmw",179,89,25,47),
+    ("raptor",290,199,28,55),
+    ("landcruiser",1,1,29,56),
+    ("landcruiser2",197,198,29,56),
+    ("raptor2",320,199,28,55),
+    ("suv",380,204,28,50),
+    ("suv2",410,204,28,50),
+    ("mustang2",66,80,26,49),
+    ("camaro",87,134,26,48),
+    ("camaro2",94,84,26,48),
+    ("challenger2",115,135,28,48),
+    ("challenger3",145,138,28,48)
+];
 
 // #[derive(Debug,Clone)]
 pub enum DisplayType<'a> {
@@ -140,7 +154,7 @@ impl<'a> Car<'a> {
         self.sprite = DisplayType::from(texture);
         let i: usize = rand::random_range(0..TRECTS.len());
         let v = TRECTS[i];
-        self.t_rect = Some(Rect::new(v.0, v.1, v.2, v.3))
+        self.t_rect = Some(Rect::new(v.1, v.2, v.3, v.4))
     }
 
     pub fn update(&mut self, others: Vec<Car>) -> UpdateState {
