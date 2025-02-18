@@ -78,29 +78,31 @@ fn main() -> Result<(), String> {
             match  c.update(tmp) {
                 UpdateState::Finished => to_remove = i as i32,
                 UpdateState::Waiting => {
-                    let r = match (cars::DEBUG,c.get_detections()) {
-                        (true,Some((l,u))) => (l,u),
-                        _ => break,
+                    match (cars::DEBUG,c.get_detections()) {
+                        (true,Some((l,u))) => {
+                            canvas.set_draw_color(Color::RED);
+                            canvas.draw_rect(l).unwrap();
+                            canvas.draw_rect(u).unwrap();
+                        },
+                        _ => {},
                     };
-                    canvas.set_draw_color(Color::RED);
-                    canvas.draw_rect(r.0).unwrap();
-                    canvas.draw_rect(r.1).unwrap();
                 },
                 UpdateState::Collided => {
                     collisions_count += 1;
                     to_remove = i as i32;
                 },
                 _ => {
-                    let r = match (cars::DEBUG,c.get_detections()) {
-                        (true,Some((l,u))) => (l,u),
-                        _ => break,
+                    match (cars::DEBUG,c.get_detections()) {
+                        (true,Some((l,u))) => {
+                            canvas.set_draw_color(Color::GRAY);
+                            canvas.draw_rect(l).unwrap();
+                            canvas.draw_rect(u).unwrap();
+                        },
+                        _ => {},
                     };
-                    canvas.set_draw_color(Color::GRAY);
-                    canvas.draw_rect(r.0).unwrap();
-                    canvas.draw_rect(r.1).unwrap();
                 },
             }
-            // println!("{:?}",c.current_direction);
+
             c.display(&mut canvas).unwrap();
         }
         if to_remove != -1 {
