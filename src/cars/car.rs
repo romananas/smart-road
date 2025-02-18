@@ -105,6 +105,10 @@ impl<'a> Car<'a> {
         self.path = path;
     }
 
+    pub fn set_velocity(&mut self,velocity: u32) {
+        self.velocity = velocity;
+    }
+
     pub fn set_debug(&mut self,b: bool) {
         self.debug = b;
     }

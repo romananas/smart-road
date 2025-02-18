@@ -11,7 +11,8 @@ use entities::Entity;
 
 const SCREEN_SIZE: (u32,u32) = (1100,1100);
 const COOLDOWN_MS: u64 = 500;
-const TICK_SPEED: u32 = 60;
+const TICK_SPEED: u32 = 160;
+const VELOCITY_P_S:u32 = 240;
 // const DEBUG: bool = true;
 
 fn init_window(sdl_context: sdl2::Sdl) -> Result<Window,String> {
@@ -58,6 +59,7 @@ fn main() -> Result<(), String> {
                 if cooldown_now.elapsed() >= Duration::from_millis(COOLDOWN_MS) {
                     let mut tmp = map::spawn_car(from, to, 32,45).unwrap();
                     tmp.set_texture(&car_texture);
+                    tmp.set_velocity(VELOCITY_P_S/TICK_SPEED);
                     cars.push(tmp);
                     cooldown_now = std::time::Instant::now();
                     car_spawned += 1;
