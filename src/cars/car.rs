@@ -52,7 +52,7 @@ pub struct Car<'a> {
     state: UpdateState,
     velocity: u32,
     w_l: (u32,u32),
-
+    
     path: Vec<Point>,
     current_direction: Direction,
     debug : bool
@@ -266,7 +266,7 @@ impl<'a> Entity for Car<'a> {
             }
             canvas.copy_ex(
                 texture, 
-                None, 
+                Rect::new(179, 89, 25, 47), 
                 Some(Rect::from_center(self.hit_box.center(),self.w_l.0,self.w_l.1)), 
                 angle, 
                 None, 

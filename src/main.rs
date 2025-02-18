@@ -49,7 +49,7 @@ fn main() -> Result<(), String> {
     let mut debug = false;
 
     let tc = canvas.texture_creator();
-    let car_texture = tc.load_texture("assets/car.png")?;
+    let car_texture = tc.load_texture("assets/cars.png")?;
 
 
     'running: loop {
