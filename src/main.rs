@@ -74,7 +74,7 @@ fn main() -> Result<(), String> {
         canvas.clear();
 
         map::load_map(&mut canvas)?;
-        map::show_points(&mut canvas)?;
+        // map::show_points(&mut canvas)?;
 
 
         let cars_clone = cars.clone();

@@ -4,7 +4,7 @@ use sdl2::{image::LoadTexture, pixels::Color, rect::{Point, Rect}, render::Canva
 use crate::cars::Car;
 
 const BORDER_UP_LEFT: i32 = -40;
-const BORDER_DOWN_RIGHT: i32 = 1100;
+const BORDER_DOWN_RIGHT: i32 = 1120;
 
 // W : LEFT
 // E : RIGHT
