@@ -5,10 +5,13 @@ use crate::entities::*;
 use sdl2::render::Texture;
 
 
-const BASE_VELOCITY: u32 = 4;
+pub const BASE_VELOCITY: u32 = 4;
 const SLOW_VELOCITY: u32 = BASE_VELOCITY ;
 const SAFE_DISTANCE: u32 = 20;
 const DETECTION_OFFSET: i32 = -0;
+
+
+
 
 const TRECTS: [(&str,i32,i32,u32,u32);12] = 
 [
@@ -72,7 +75,7 @@ pub struct Car<'a> {
 
     // Logic
     state: UpdateState,
-    velocity: u32,
+    pub velocity: u32,
     w_l: (u32,u32),
     path: Vec<Point>,
     current_direction: Direction,
