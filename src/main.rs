@@ -4,7 +4,7 @@ mod cars;
 mod map;
 
 use std::time::Duration;
-use cars::{UpdateState, BASE_VELOCITY};
+use cars::{UpdateState, BASE_VELOCITY,SLOW_VELOCITY};
 use sdl2::{image::LoadTexture, pixels::Color, video::Window};
 
 use entities::Entity;
@@ -46,8 +46,8 @@ fn main() -> Result<(), String> {
 
     let mut collisions_count: u32 = 0u32;
 
-    let max_velocity = BASE_VELOCITY;
-    let min_velocity = BASE_VELOCITY;
+    let max_velocity = 240;
+    let min_velocity = 180;
 
     let mut debug = false;
 
