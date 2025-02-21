@@ -4,7 +4,7 @@ mod cars;
 mod map;
 
 use std::time::Duration;
-use cars::{UpdateState, BASE_VELOCITY,SLOW_VELOCITY};
+use cars::UpdateState;
 use sdl2::{image::LoadTexture, pixels::Color, video::Window};
 
 use entities::Entity;
