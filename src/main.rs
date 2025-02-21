@@ -4,7 +4,7 @@ mod cars;
 mod map;
 
 use std::time::Duration;
-use cars::UpdateState;
+use cars::{UpdateState, BASE_VELOCITY};
 use sdl2::{image::LoadTexture, pixels::Color, video::Window};
 
 use entities::Entity;
@@ -45,6 +45,9 @@ fn main() -> Result<(), String> {
     let mut car_passed: u32 = 0u32;
 
     let mut collisions_count: u32 = 0u32;
+
+    let max_velocity = BASE_VELOCITY;
+    let min_velocity = BASE_VELOCITY;
 
     let mut debug = false;
 
@@ -124,6 +127,6 @@ fn main() -> Result<(), String> {
         tick_time = std::time::Instant::now();
     }
 
-    println!("\ncar spawned : {}\ncar passed  : {}\ncollisions  : {}\n",car_passed,car_spawned,collisions_count);
+    println!("\ncar spawned : {}\ncar passed  : {}\ncollisions  : {}\nmax velocity : {}\nmin velocity : {}\n ",car_passed,car_spawned,collisions_count, max_velocity, min_velocity);
     Ok(())
 }
